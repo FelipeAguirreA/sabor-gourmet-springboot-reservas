@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Mesas</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container mt-4">
+
+        <a th:href="@{/admin}" class="btn btn-secondary mb-3">Volver</a>
+
+        <h1 class="mb-4 text-center">Listado de Mesas</h1>
+
+        <a class="btn btn-success mb-3" th:href="@{/mesas/registrar}">Agregar Mesa</a>
+
+        <!-- Modal para mensajes flash -->
+        <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="messageModalLabel">Mensaje</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body" id="messageModalBody"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+        var errorMsg = /*[[${error}]]*/ null;
+        var successMsg = /*[[${success}]]*/ null;
+        function showMessageModal(title, message) {
+            var label = document.getElementById('messageModalLabel');
+            var body = document.getElementById('messageModalBody');
+            if (label) label.textContent = title || 'Mensaje';
+            if (body) body.textContent = message || '';
+            var modalEl = document.getElementById('messageModal');
+            if (modalEl) new bootstrap.Modal(modalEl).show();
+        }
+        if (errorMsg || successMsg) {
+            var title = errorMsg ? 'Error' : 'Éxito';
+            var body = errorMsg || successMsg;
+            document.addEventListener('DOMContentLoaded', function () { showMessageModal(title, body); });
+        }
+        </script>
+
+       <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Capacidad</th>
+                    <th>Ubicación</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="mesa : ${mesas}">
+                    <td th:text="${mesa.id}"></td>
+                    <td th:text="${mesa.capacidad}"></td>
+                    <td th:text="${mesa.ubicacion}"></td>
+
+                    <td>
+                        <span th:if="${mesa.disponible}">Sí</span>
+                        <span th:if="${!mesa.disponible}">No</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

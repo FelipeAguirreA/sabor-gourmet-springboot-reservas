@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Panel Administrador</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Panel de Administración</h1>
+
+        <!-- Alert global en la página principal (mensajes rápidos sin modal) -->
+        <div id="mainAlert"></div>
+
+        <div class="d-flex justify-content-center gap-3 mb-4">
+            <a class="btn btn-primary" th:href="@{/clientes}">Ver Clientes</a>
+            <a class="btn btn-success" th:href="@{/mesas}">Ver Mesas</a>
+            <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#reservasModal">Gestionar Reservas</button>
+        </div>
+
+        <h3 class="mb-3">Mesas Registradas</h3>
+
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Capacidad</th>
+                    <th>Ubicación</th>
+                    <th>Disponible</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="mesasTableBody">
+                <tr th:each="mesa : ${mesas}">
+                    <td th:text="${mesa.id}">1</td>
+                    <td th:text="${mesa.capacidad}">4</td>
+                    <td th:text="${mesa.ubicacion}">Interior</td>
+                    <td>
+                        <span th:if="${mesa.disponible == true}">Sí</span>
+                        <span th:if="${mesa.disponible == false}">No</span>
+                        <span th:if="${mesa.disponible == null}">—</span>
+                    </td>
+
+                    <td>
+                        <a class="btn btn-sm btn-warning" th:href="@{|/mesas/${mesa.id}|}">Ver</a>
+                        <a class="btn btn-sm btn-danger" th:href="@{|/mesas/eliminar/${mesa.id}|}" onclick="return confirm('¿Estás seguro de eliminar esta mesa?')">Eliminar</a>
+                        <!-- Ver Reserva: muestra la info de reserva en la página principal-->
+                        <button class="btn btn-sm btn-info" th:attr="onclick=|verReservaInline(${mesa.id})|">Ver Reservas</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="mt-5 mb-3">Clientes Registrados</h3>
+
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="cliente : ${clientes}">
+                    <td th:text="${cliente.id}">1</td>
+                    <td th:text="${cliente.nombre}">Juan</td>
+                    <td th:text="${cliente.apellido}">Pérez</td>
+                    <td th:text="${cliente.telefono}">123456789</td>
+                    <td th:text="${cliente.email}">juan@example.com</td>
+
+                    <td>
+                        <a class="btn btn-sm btn-warning" th:href="@{|/clientes/${cliente.id}|}">Ver</a>
+                        <a class="btn btn-sm btn-danger" th:href="@{|/clientes/eliminar/${cliente.id}|}" onclick="return confirm('¿Estás seguro de eliminar este cliente?')">Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+    <!-- Modal genérico para mostrar mensajes (errores/éxitos) -->
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageModalLabel">Mensaje</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="messageModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMessageModal(title, message) {
+            var label = document.getElementById('messageModalLabel');
+            var body = document.getElementById('messageModalBody');
+            label.textContent = title || 'Mensaje';
+            body.textContent = message || '';
+            var modal = new bootstrap.Modal(document.getElementById('messageModal'));
+            modal.show();
+        }
+    </script>
+
+    <!-- Abrir modal si hay flash messages -->
+    <script th:inline="javascript">
+      var errorMsg = /*[[${error}]]*/ null;
+      var successMsg = /*[[${success}]]*/ null;
+      if (errorMsg || successMsg) {
+        var title = errorMsg ? 'Error' : 'Éxito';
+        var body = errorMsg || successMsg;
+        document.addEventListener('DOMContentLoaded', function () { showMessageModal(title, body); });
+      }
+    </script>
+
+    <!-- Insertar fragmento modularizado para gestionar reservas -->
+    <div th:insert="gestionar-reserva :: reservasFragment"></div>
+</body>
+
+</html>
