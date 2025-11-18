@@ -19,6 +19,9 @@
             <!-- ID (oculto) -->
             <input type="hidden" th:field="*{id}" />
 
+            <!-- Mantener información de reserva al editar -->
+            <input type="hidden" th:field="*{reservadoPorId}" />
+            <input type="hidden" th:field="*{reservadoPorNombre}" />
             <div class="mb-3">
                 <label for="capacidad" class="form-label">Capacidad</label>
                 <input type="number" id="capacidad" th:field="*{capacidad}" class="form-control" required>
